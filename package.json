@@ -6,9 +6,11 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "test:db": "node scripts/test-db.mjs"
   },
   "dependencies": {
+    "dotenv": "^16.4.5",
     "@base-ui/react": "^1.0.0-beta.2",
     "@radix-ui/react-avatar": "^1.1.10",
     "@radix-ui/react-dialog": "^1.1.15",
@@ -21,6 +23,10 @@
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
     "lucide-react": "^0.542.0",
+    "mongodb": "^6.19.0",
+    "mongoose": "^8.18.0",
+    "mongodb": "^7.5.0",
+    "mongoose": "^9.9.3",
     "next": "15.5.2",
     "react": "19.1.0",
     "react-dom": "19.1.0",
@@ -39,6 +45,7 @@
     "eslint-config-next": "15.5.2",
     "postcss": "^8",
     "tailwindcss": "^4",
+    "ts-node": "^10.9.2",
     "typescript": "^5.9.3"
   }
 }
