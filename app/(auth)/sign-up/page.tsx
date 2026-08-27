@@ -71,7 +71,7 @@ const SignUp = () => {
                 <CountrySelectField
                     name="country"
                     label="Country"
-                    control={control}
+                    control={control as never}
                     error={errors.country}
                     required
                 />
