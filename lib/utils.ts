@@ -77,9 +77,7 @@ export const formatArticle = (
     symbol?: string,
     index: number = 0
 ) => ({
-  id: isCompanyNews
-      ? `${Date.now()}-${index}`
-      : `${article.id ?? "news"}-${index}`,
+  id: `${article.id ?? article.url ?? article.headline ?? "news"}-${index}`,
   headline: article.headline!.trim(),
   summary: article.summary!.trim().substring(0, isCompanyNews ? 200 : 150) + "...",
   source: article.source || (isCompanyNews ? "Company News" : "Market News"),
