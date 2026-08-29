@@ -23,10 +23,10 @@ export const sendWelcomeEmail = async ({
     );
 
     await transporter.sendMail({
-        from: `"Signalist" <${process.env.NODEMAILER_EMAIL}>`,
+        from: `"Ticker" <${process.env.NODEMAILER_EMAIL}>`,
         to: email,
-        subject: "Welcome to Signalist - your stock market toolkit is ready!",
-        text: "Thanks for joining Signalist",
+        subject: "Welcome to Ticker - your stock market toolkit is ready!",
+        text: "Thanks for joining Ticker",
         html: htmlTemplate,
     });
 };
@@ -46,10 +46,10 @@ export const sendNewsSummaryEmail = async ({
     ).replace("{{newsContent}}", newsContent);
 
     await transporter.sendMail({
-        from: `"Signalist News" <${process.env.NODEMAILER_EMAIL}>`,
+        from: `"Ticker News" <${process.env.NODEMAILER_EMAIL}>`,
         to: email,
         subject: `Market News Summary Today - ${date}`,
-        text: "Today's market news summary from Signalist",
+        text: "Today's market news summary from Ticker",
         html: htmlTemplate,
     });
 };

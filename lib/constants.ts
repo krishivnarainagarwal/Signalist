@@ -170,6 +170,54 @@ export const MARKET_DATA_WIDGET_CONFIG = {
     ],
 };
 
+export const getTradingViewSymbol = (symbol: string, exchange?: string) => {
+    const ticker = symbol.trim().toUpperCase();
+    if (!ticker || ticker.includes(':')) return ticker;
+
+    const ex = (exchange || '').toUpperCase();
+    if (ex.includes('NASDAQ')) return `NASDAQ:${ticker}`;
+    if (ex.includes('NYSE')) return `NYSE:${ticker}`;
+    if (ex.includes('AMEX')) return `AMEX:${ticker}`;
+
+    return ticker;
+};
+
+export const SYMBOL_INFO_WIDGET_CONFIG = (symbol: string) => ({
+    symbol: symbol.toUpperCase(),
+    colorTheme: 'dark',
+    isTransparent: true,
+    locale: 'en',
+    autosize: true,
+    width: '100%',
+    height: 170,
+});
+
+export const CANDLE_CHART_WIDGET_CONFIG = (symbol: string) => ({
+    allow_symbol_change: false,
+    calendar: false,
+    details: false,
+    hide_side_toolbar: true,
+    hide_top_toolbar: false,
+    hide_legend: false,
+    hide_volume: false,
+    hotlist: false,
+    interval: 'D',
+    locale: 'en',
+    save_image: false,
+    style: 1,
+    symbol: symbol.toUpperCase(),
+    theme: 'dark',
+    timezone: 'Etc/UTC',
+    backgroundColor: '#141414',
+    gridColor: '#141414',
+    autosize: true,
+    watchlist: [],
+    withdateranges: false,
+    compareSymbols: [],
+    studies: [],
+    width: '100%',
+    height: 600,
+});
 
 export const POPULAR_STOCK_SYMBOLS = [
     // Tech Giants (the big technology companies)
