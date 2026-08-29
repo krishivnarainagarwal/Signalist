@@ -62,4 +62,9 @@ declare global {
         error?: any;
         required?: boolean;
     };
+    type User = {
+        id: string;
+        name: string;
+        email: string;
+    };
 }
