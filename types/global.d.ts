@@ -54,8 +54,22 @@ declare global {
         error?: any;
         required?: boolean;
     };
+    type RawNewsArticle = {
+        id?: string | number;
+        headline?: string;
+        summary?: string;
+        source?: string;
+        url?: string;
+        datetime?: number;
+        image?: string;
+        category?: string;
+        related?: string;
+    };
 
-    type CountrySelectProps = {
+    type Alert = {
+        alertType: "upper" | "lower";
+        threshold: number;
+    };    type CountrySelectProps = {
         name: string;
         label: string;
         control: any;
@@ -66,5 +80,22 @@ declare global {
         id: string;
         name: string;
         email: string;
+    };
+    type UserForNewsEmail = {
+        id: string;
+        email: string;
+        name: string;
+    };
+
+    type MarketNewsArticle = {
+        id: string | number;
+        headline: string;
+        summary: string;
+        source: string;
+        url: string;
+        datetime: number;
+        image: string;
+        category: string;
+        related: string;
     };
 }
