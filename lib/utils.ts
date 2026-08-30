@@ -69,6 +69,15 @@ export const calculateNewsDistribution = (symbolsCount: number) => {
 export const validateArticle = (article: RawNewsArticle) =>
     Boolean(article.headline && article.summary && article.url && article.datetime);
 
+export const validateCompanyArticle = (article: RawNewsArticle) =>
+    Boolean(article.headline && article.url && article.datetime);
+
+export const normalizeFinnhubSymbol = (symbol: string) => {
+    const upper = symbol.trim().toUpperCase();
+    if (!upper) return upper;
+    return upper.includes(":") ? upper.split(":").pop() || upper : upper;
+};
+
 export const getTodayString = () => new Date().toISOString().split("T")[0];
 
 export const formatArticle = (
@@ -76,27 +85,32 @@ export const formatArticle = (
     isCompanyNews: boolean,
     symbol?: string,
     index: number = 0
-) => ({
-  id: `${article.id ?? article.url ?? article.headline ?? "news"}-${index}`,
-  headline: article.headline!.trim(),
-  summary: article.summary!.trim().substring(0, isCompanyNews ? 200 : 150) + "...",
-  source: article.source || (isCompanyNews ? "Company News" : "Market News"),
-  url: article.url!,
-  datetime: article.datetime!,
-  image: article.image || "",
-  category: isCompanyNews ? "company" : article.category || "general",
-  related: isCompanyNews ? symbol! : article.related || "",
-});
+) => {
+  const rawSummary = (article.summary || article.headline || "").trim();
+  const limit = isCompanyNews ? 200 : 150;
+
+  return {
+    id: `${article.id ?? article.url ?? article.headline ?? "news"}-${index}`,
+    headline: (article.headline || "").trim(),
+    summary: rawSummary.length > limit ? `${rawSummary.substring(0, limit)}...` : rawSummary,
+    source: article.source || (isCompanyNews ? "Company News" : "Market News"),
+    url: article.url || "",
+    datetime: article.datetime || 0,
+    image: article.image || "",
+    category: isCompanyNews ? "company" : article.category || "general",
+    related: isCompanyNews ? symbol || "" : article.related || "",
+  };
+};
 
 export const formatChangePercent = (changePercent?: number) => {
-  if (!changePercent) return "";
+  if (changePercent === undefined || Number.isNaN(changePercent)) return "";
   const sign = changePercent > 0 ? "+" : "";
   return `${sign}${changePercent.toFixed(2)}%`;
 };
 
 export const getChangeColorClass = (changePercent?: number) => {
-  if (!changePercent) return "text-gray-400";
-  return changePercent > 0 ? "text-green-500" : "text-red-500";
+  if (changePercent === undefined || Number.isNaN(changePercent) || changePercent === 0) return "text-gray-400";
+  return changePercent > 0 ? "text-sage" : "text-red-500";
 };
 
 export const formatPrice = (price: number) =>

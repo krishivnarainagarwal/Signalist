@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 156 32" fill="none" role="img" aria-labelledby="alphaiqLogoTitle">
+  <title id="alphaiqLogoTitle">AlphaIQ</title>
+  <path d="M7 26L16 6l9 20" stroke="#E07A5F" stroke-width="2.5" stroke-linecap="square" stroke-linejoin="miter"/>
+  <path d="M11 18.5h10" stroke="#E07A5F" stroke-width="2.3" stroke-linecap="square"/>
+  <path d="M22.5 11l3.5-4.5 3 2" stroke="#F4EDE4" stroke-width="1.7" stroke-linecap="square" stroke-linejoin="miter"/>
+  <text x="38" y="22" font-family="ui-sans-serif, system-ui, -apple-system, Segoe UI, sans-serif" font-size="16" font-weight="650" letter-spacing="0.6">
+    <tspan fill="#F4EDE4">Alpha</tspan><tspan fill="#E07A5F">IQ</tspan>
+  </text>
+</svg>

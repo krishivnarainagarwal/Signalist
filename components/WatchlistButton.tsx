@@ -41,9 +41,9 @@ const WatchlistButton = ({
             type="button"
             disabled={pending}
             onClick={handleClick}
-            className={cn('watchlist-btn !w-fit h-9 px-4 text-sm', added && 'watchlist-remove')}
+            className={cn('watchlist-btn', added && 'watchlist-remove')}
         >
-            {added ? 'In watchlist' : 'Add to watchlist'}
+            {added ? 'Saved' : 'Save'}
         </button>
     );
 };

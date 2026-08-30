@@ -1,7 +1,7 @@
 import Link from "next/link";
-import Image from "next/image";
 import NavItems from "@/components/NavItems";
 import UserDropdown from "@/components/UserDropdown";
+import AlphaIQLogo from "@/components/AlphaIQLogo";
 import { searchStocks } from "@/lib/actions/finnhub.actions";
 
 const Header = async ({ user }: { user: User }) => {
@@ -10,14 +10,8 @@ const Header = async ({ user }: { user: User }) => {
     return (
         <header className="sticky top-0 header">
             <div className="container header-wrapper">
-                <Link href="/">
-                    <Image
-                        src="/assets/icons/logo.svg"
-                        alt="Ticker logo"
-                        width={140}
-                        height={32}
-                        className="h-8 w-auto cursor-pointer"
-                    />
+                <Link href="/" aria-label="AlphaIQ" className="flex items-center">
+                    <AlphaIQLogo />
                 </Link>
 
                 <nav className="hidden sm:block">
