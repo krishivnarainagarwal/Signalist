@@ -16,6 +16,20 @@ import { addToWatchlist } from '@/lib/actions/watchlist.actions';
 
 const EMPTY_STOCKS: StockWithWatchlistStatus[] = [];
 
+const highlightMatch = (text: string, term: string) => {
+    if (!term.trim()) return text;
+    const index = text.toLowerCase().indexOf(term.trim().toLowerCase());
+    if (index < 0) return text;
+    const end = index + term.trim().length;
+    return (
+        <>
+            {text.slice(0, index)}
+            <span className="text-coral">{text.slice(index, end)}</span>
+            {text.slice(end)}
+        </>
+    );
+};
+
 const SearchCommand = ({
     renderAs = 'button',
     label = 'Search',
@@ -96,9 +110,16 @@ const SearchCommand = ({
     return (
         <>
             {renderAs === 'text' ? (
-                <span onClick={() => setOpen(true)} className="search-text">
+                <button
+                    type="button"
+                    onClick={() => setOpen(true)}
+                    className="search-text inline-flex items-center gap-2 text-sm text-gray-500"
+                >
                     {label}
-                </span>
+                    <kbd className="hidden md:inline-flex h-5 items-center rounded-sm border border-gray-600 px-1.5 font-mono text-[10px] text-gray-500">
+                        ⌘K
+                    </kbd>
+                </button>
             ) : (
                 <Button onClick={() => setOpen(true)} className="search-btn">
                     {label}
@@ -114,28 +135,40 @@ const SearchCommand = ({
                     <CommandInput
                         value={searchTerm}
                         onValueChange={setSearchTerm}
-                        placeholder="Search stocks..."
+                        placeholder="AAPL, MongoDB…"
                         className="search-input"
                     />
-                    {loading && <Loader2 className="search-loader" />}
                 </div>
                 <CommandList className="search-list">
-                    {loading ? (
-                        <CommandEmpty className="search-list-empty">Loading stocks...</CommandEmpty>
-                    ) : displayStocks.length === 0 ? (
+                    {loading && (
+                        <div className="flex items-center gap-2 px-3 py-2 text-xs text-gray-500">
+                            <Loader2 className="search-loader" />
+                            Searching…
+                        </div>
+                    )}
+                    {!loading && displayStocks.length === 0 ? (
                         <CommandEmpty className="search-list-empty">
-                            {isSearchMode ? 'No results found' : 'No stocks available'}
+                            {isSearchMode
+                                ? `Nothing for “${searchTerm.trim()}”. Try the ticker.`
+                                : 'A name, or a ticker. That’s it.'}
                         </CommandEmpty>
                     ) : (
                         displayStocks.map((stock, index) => (
                             <CommandItem
-                                key={`${stock.symbol}-${stock.name}-${index}`}
-                                value={`${stock.symbol} ${stock.name}`}
+                                key={`${stock.symbol}-${stock.name}-${stock.exchange}-${index}`}
+                                value={`${stock.symbol} ${stock.name} ${stock.exchange}`}
                                 onSelect={() => handleSelectStock(stock)}
                                 className="search-item"
                             >
-                                <span className="font-medium text-gray-100">{stock.symbol}</span>
-                                <span className="search-item-name">{stock.name}</span>
+                                <span className="font-medium text-gray-100">
+                                    {highlightMatch(stock.symbol, searchTerm)}
+                                </span>
+                                <span className="search-item-name truncate text-sm font-normal text-gray-500">
+                                    {highlightMatch(stock.name, searchTerm)}
+                                </span>
+                                <span className="ml-auto text-[11px] uppercase tracking-wide text-gray-500">
+                                    {stock.exchange}
+                                </span>
                             </CommandItem>
                         ))
                     )}

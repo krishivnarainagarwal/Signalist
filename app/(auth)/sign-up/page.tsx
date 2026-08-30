@@ -9,13 +9,13 @@ import {CountrySelectField} from "@/components/forms/CountrySelectField";
 import FooterLink from "@/components/forms/FooterLink";
 import {signUpWithEmail} from "@/lib/actions/auth.actions";
 import {useRouter} from "next/navigation";
-import {toast} from "sonner";
 
 const SignUp = () => {
     const router = useRouter()
     const {
         register,
         handleSubmit,
+        setError,
         control,
         formState: { errors, isSubmitting },
     } = useForm<SignUpFormData>({
@@ -34,18 +34,23 @@ const SignUp = () => {
     const onSubmit = async (data: SignUpFormData) => {
         try {
             const result = await signUpWithEmail(data);
-            if(result.success) router.push('/');
+            if (result.success) {
+                router.push('/');
+                return;
+            }
+            setError('root', { message: result.error || 'Sign up failed' });
         } catch (e) {
             console.error(e);
-            toast.error('Sign up failed', {
-                description: e instanceof Error ? e.message : 'Failed to create an account.'
-            })
+            setError('root', {
+                message: e instanceof Error ? e.message : 'Sign up failed',
+            });
         }
     }
 
     return (
         <>
-            <h1 className="form-title">Sign Up & Personalize</h1>
+            <h1 className="form-title">Pull up a chair.</h1>
+            <p className="mb-8 text-sm text-gray-500">A quiet place for the names you actually follow.</p>
 
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
                 <InputField
@@ -63,7 +68,7 @@ const SignUp = () => {
                     placeholder="you@email.com"
                     register={register}
                     error={errors.email}
-                    validation={{ required: 'Email name is required', pattern: /^\w+@\w+\.\w+$/, message: 'Email address is required' }}
+                    validation={{ required: 'Email is required', pattern: /^\w+@\w+\.\w+$/ }}
                 />
 
                 <InputField
@@ -114,11 +119,15 @@ const SignUp = () => {
                     required
                 />
 
+                {errors.root && (
+                    <p className="text-sm text-red-500">{errors.root.message}</p>
+                )}
+
                 <Button type="submit" disabled={isSubmitting} className="yellow-btn w-full mt-5">
-                    {isSubmitting ? 'Creating Account' : 'Start Your Investing Journey'}
+                    {isSubmitting ? 'One moment…' : 'Join in'}
                 </Button>
 
-                <FooterLink text="Already have an account?" linkText="Sign in" href="/sign-in" />
+                <FooterLink text="Already seated?" linkText="Sign in" href="/sign-in" />
             </form>
         </>
     )

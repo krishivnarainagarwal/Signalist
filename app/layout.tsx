@@ -1,20 +1,21 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Figtree, Newsreader } from "next/font/google";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const sans = Figtree({
+  variable: "--font-figtree",
   subsets: ["latin"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const display = Newsreader({
+  variable: "--font-newsreader",
   subsets: ["latin"],
+  style: ["normal", "italic"],
 });
 
 export const metadata: Metadata = {
-  title: "Ticker",
-  description: "Track real-time stock prices, get personalized alerts and explore detailed company insights.",
+  title: "AlphaIQ",
+  description: "The names you follow, in one quiet place.",
 };
 
 export default function RootLayout({
@@ -25,7 +26,7 @@ export default function RootLayout({
   return (
       <html lang="en" className="dark">
       <body
-          className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+          className={`${sans.variable} ${display.variable} antialiased`}
       >
       {children}
       </body>

@@ -1,55 +1,25 @@
-export const PERSONALIZED_WELCOME_EMAIL_PROMPT = `Generate highly personalized HTML content that will be inserted into an email template at the {{intro}} placeholder.
+export const PERSONALIZED_WELCOME_EMAIL_PROMPT = `Write HTML for the {{intro}} slot in an AlphaIQ welcome email.
 
-User profile data:
+User profile:
 {{userProfile}}
 
-PERSONALIZATION REQUIREMENTS:
-You MUST create content that is obviously tailored to THIS specific user by:
+Do not start with "Welcome" — the template already says "Welcome aboard {{name}}".
+Open with AlphaIQ (e.g. "Thanks for joining AlphaIQ", "AlphaIQ is ready for you", "You're set on AlphaIQ").
+Use this user's goals, risk tolerance, preferred industry, and experience in both sentences.
 
-IMPORTANT: Do NOT start the personalized content with "Welcome" since the email header already says "Welcome aboard {{name}}". Use alternative openings like "Thanks for joining", "Great to have you", "You're all set", "Perfect timing", etc.
+Return ONLY this markup, no markdown:
+<p class="mobile-text" style="margin: 0 0 30px 0; font-size: 16px; line-height: 1.6; color: #CCDADC;">content</p>
+Exactly two sentences, 35–50 words. Wrap personalized terms in <strong>.
+Do not include "Here's what you can do right now:".
 
-1. **Direct Reference to User Details**: Extract and use specific information from their profile:
-   - Their exact investment goals or objectives
-   - Their stated risk tolerance level
-   - Their preferred sectors/industries mentioned
-   - Their experience level or background
-   - Any specific stocks/companies they're interested in
-   - Their investment timeline (short-term, long-term, retirement)
+Examples:
+<p class="mobile-text" style="margin: 0 0 30px 0; font-size: 16px; line-height: 1.6; color: #CCDADC;">Thanks for joining AlphaIQ. With a focus on <strong>technology growth stocks</strong>, you'll get live alerts on the names you actually follow, so moves show up before they hit the tape.</p>
+<p class="mobile-text" style="margin: 0 0 30px 0; font-size: 16px; line-height: 1.6; color: #CCDADC;">AlphaIQ is ready for your <strong>conservative retirement strategy</strong>. We'll surface dividend names without the noise so you can track progress with a clear, quiet feed.</p>
+<p class="mobile-text" style="margin: 0 0 30px 0; font-size: 16px; line-height: 1.6; color: #CCDADC;">You're set on AlphaIQ. If you're new to the <strong>healthcare sector</strong>, alerts stay in plain language so you can learn the names without the jargon.</p>`
 
-2. **Contextual Messaging**: Create content that shows you understand their situation:
-   - New investors → Reference learning/starting their journey
-   - Experienced traders → Reference advanced tools/strategy enhancement  
-   - Retirement planning → Reference building wealth over time
-   - Specific sectors → Reference those exact industries by name
-   - Conservative approach → Reference safety and informed decisions
-   - Aggressive approach → Reference opportunities and growth potential
+export const NEWS_SUMMARY_EMAIL_PROMPT = `Write HTML for an AlphaIQ market news email. Insert it into NEWS_SUMMARY_EMAIL_TEMPLATE at {{newsContent}}.
 
-3. **Personal Touch**: Make it feel like it was written specifically for them:
-   - Use their goals in your messaging
-   - Reference their interests directly
-   - Connect features to their specific needs
-   - Make them feel understood and seen
-
-CRITICAL FORMATTING REQUIREMENTS:
-- Return ONLY clean HTML content with NO markdown, NO code blocks, NO backticks
-- Use SINGLE paragraph only: <p class="mobile-text" style="margin: 0 0 30px 0; font-size: 16px; line-height: 1.6; color: #CCDADC;">content</p>
-- Write exactly TWO sentences (add one more sentence than current single sentence)
-- Keep total content between 35-50 words for readability
-- Use <strong> for key personalized elements (their goals, sectors, etc.)
-- DO NOT include "Here's what you can do right now:" as this is already in the template
-- Make every word count toward personalization
-- Second sentence should add helpful context or reinforce the personalization
-
-Example personalized outputs (showing obvious customization with TWO sentences):
-<p class="mobile-text" style="margin: 0 0 30px 0; font-size: 16px; line-height: 1.6; color: #CCDADC;">Thanks for joining Signalist! As someone focused on <strong>technology growth stocks</strong>, you'll love our real-time alerts for companies like the ones you're tracking. We'll help you spot opportunities before they become mainstream news.</p>
-
-<p class="mobile-text" style="margin: 0 0 30px 0; font-size: 16px; line-height: 1.6; color: #CCDADC;">Great to have you aboard! Perfect for your <strong>conservative retirement strategy</strong> — we'll help you monitor dividend stocks without overwhelming you with noise. You can finally track your portfolio progress with confidence and clarity.</p>
-
-<p class="mobile-text" style="margin: 0 0 30px 0; font-size: 16px; line-height: 1.6; color: #CCDADC;">You're all set! Since you're new to investing, we've designed simple tools to help you build confidence while learning the <strong>healthcare sector</strong> you're interested in. Our beginner-friendly alerts will guide you without the confusing jargon.</p>`
-
-export const NEWS_SUMMARY_EMAIL_PROMPT = `Generate HTML content for a market news summary email that will be inserted into the NEWS_SUMMARY_EMAIL_TEMPLATE at the {{newsContent}} placeholder.
-
-News data to summarize:
+News data:
 {{newsData}}
 
 CRITICAL FORMATTING REQUIREMENTS:
@@ -122,22 +92,14 @@ Between major sections, use:
 <div style="border-top: 1px solid #374151; margin: 32px 0 24px 0;"></div>
 
 Content guidelines:
-- Organize news into logical sections with icons (📊 Market Overview, 📈 Top Gainers, 📉 Top Losers, 🔥 Breaking News, 💼 Earnings Reports, 🏛️ Economic Data, etc.)
-- NEVER repeat section headings - use each section type only once per email
-- For each news article, include its actual headline/title from the news data
-- Provide MINIMUM 3 CONCISE bullet points (NO "Key Takeaways" label - start directly with bullets)
-- Each bullet should be SHORT and EASY TO UNDERSTAND - one clear sentence preferred
-- Use PLAIN ENGLISH - avoid jargon, complex financial terms, or insider language
-- Explain concepts as if talking to someone new to investing
-- Include specific numbers but explain what they mean in simple terms
-- Add "Bottom Line" context in everyday language anyone can understand
-- Use clean, light design with yellow bullets for better readability
-- Make each article easy to scan with clear spacing and structure
-- Always include simple "Read Full Story" buttons with actual URLs
-- Focus on PRACTICAL insights regular people can understand and use
-- Explain what the news means for regular investors' money
-- Keep language conversational and accessible to everyone
-- Prioritize BREVITY and CLARITY over detailed explanations
+- Group into sections with icons (📊 Market Overview, 📈 Top Gainers, 📉 Top Losers, 🔥 Breaking News, 💼 Earnings, 🏛️ Economic Data)
+- Use each section heading once
+- Use the actual headline from the news data
+- Three short bullets per article (no "Key Takeaways" label)
+- Specific numbers, one idea per bullet
+- "Bottom Line" in one sentence
+- Yellow bullets, real "Read Full Story" URLs
+- Voice: AlphaIQ — concise, no tutorial tone
 
 Example structure:
 <h3 class="mobile-news-title dark-text" style="margin: 30px 0 15px 0; font-size: 20px; font-weight: 600; color: #f8f9fa; line-height: 1.3;">📊 Market Overview</h3>

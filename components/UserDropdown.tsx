@@ -15,6 +15,29 @@ import {LogOut} from "lucide-react";
 import NavItems from "@/components/NavItems";
 import {signOut} from "@/lib/actions/auth.actions";
 
+const isRemoteImage = (value?: string | null) =>
+    typeof value === "string" && /^https?:\/\//i.test(value.trim());
+
+const avatarLetter = (user: User) => {
+    const fromName = user.name?.trim()?.[0];
+    if (fromName) return fromName.toUpperCase();
+    const fromEmail = user.email?.trim()?.[0];
+    if (fromEmail) return fromEmail.toUpperCase();
+    return "A";
+};
+
+const UserAvatar = ({ user, className }: { user: User; className: string }) => {
+    const src = isRemoteImage(user.image) ? user.image!.trim() : undefined;
+    return (
+        <Avatar className={className}>
+            {src ? <AvatarImage src={src} alt={user.name || "AlphaIQ"} /> : null}
+            <AvatarFallback className="bg-coral text-cream text-sm font-semibold">
+                {avatarLetter(user)}
+            </AvatarFallback>
+        </Avatar>
+    );
+};
+
 const UserDropdown = ({ user, initialStocks }: { user: User; initialStocks: StockWithWatchlistStatus[] }) => {
     const router = useRouter();
 
@@ -25,13 +48,8 @@ const UserDropdown = ({ user, initialStocks }: { user: User; initialStocks: Stoc
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="flex items-center gap-3 text-gray-4 hover:text-yellow-500">
-                    <Avatar className="h-8 w-8">
-                        <AvatarImage src="https://avatars.githubusercontent.com/u/153423955?s=280&v=4" />
-                        <AvatarFallback className="bg-yellow-500 text-yellow-900 text-sm font-bold">
-                            {user.name[0]}
-                        </AvatarFallback>
-                    </Avatar>
+                <Button variant="ghost" className="flex items-center gap-3 text-gray-500 hover:text-cream">
+                    <UserAvatar user={user} className="h-8 w-8" />
                     <div className="hidden md:flex flex-col items-start">
                         <span className='text-base font-medium text-gray-400'>
                             {user.name}
@@ -39,15 +57,10 @@ const UserDropdown = ({ user, initialStocks }: { user: User; initialStocks: Stoc
                     </div>
                 </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent className="text-gray-400">
+            <DropdownMenuContent className="text-gray-500 bg-gray-800 border-gray-600">
                 <DropdownMenuLabel>
                     <div className="flex relative items-center gap-3 py-2">
-                        <Avatar className="h-10 w-10">
-                            <AvatarImage src="https://avatars.githubusercontent.com/u/153423955?s=280&v=4" />
-                            <AvatarFallback className="bg-yellow-500 text-yellow-900 text-sm font-bold">
-                                {user.name[0]}
-                            </AvatarFallback>
-                        </Avatar>
+                        <UserAvatar user={user} className="h-10 w-10" />
                         <div className="flex flex-col">
                             <span className='text-base font-medium text-gray-400'>
                                 {user.name}
@@ -57,9 +70,9 @@ const UserDropdown = ({ user, initialStocks }: { user: User; initialStocks: Stoc
                     </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator className="bg-gray-600"/>
-                <DropdownMenuItem onClick={handleSignOut} className="text-gray-100 text-md font-medium focus:bg-transparent focus:text-yellow-500 transition-colors cursor-pointer">
+                <DropdownMenuItem onClick={handleSignOut} className="text-cream text-md font-medium focus:bg-transparent focus:text-coral transition-colors cursor-pointer">
                     <LogOut className="h-4 w-4 mr-2 hidden sm:block" />
-                    Logout
+                    Sign out
                 </DropdownMenuItem>
                 <DropdownMenuSeparator className="hidden sm:block bg-gray-600"/>
                 <nav className="sm:hidden">

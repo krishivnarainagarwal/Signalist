@@ -1,7 +1,7 @@
 "use server";
 
 import { cache } from "react";
-import { formatArticle, getDateRange, validateArticle } from "@/lib/utils";
+import { formatArticle, getDateRange, normalizeFinnhubSymbol, validateArticle, validateCompanyArticle } from "@/lib/utils";
 import { POPULAR_STOCK_SYMBOLS } from "@/lib/constants";
 
 const FINNHUB_BASE_URL = "https://finnhub.io/api/v1";
@@ -20,29 +20,65 @@ async function fetchJSON<T>(url: string, revalidateSeconds?: number): Promise<T>
     return (await res.json()) as T;
 }
 
+async function fetchCompanyNews(
+    symbol: string,
+    range: { from: string; to: string },
+    token: string
+): Promise<RawNewsArticle[]> {
+    const finnhubSymbol = normalizeFinnhubSymbol(symbol);
+    const url = `${FINNHUB_BASE_URL}/company-news?symbol=${encodeURIComponent(finnhubSymbol)}&from=${range.from}&to=${range.to}&token=${token}`;
+    const publicUrl = `${FINNHUB_BASE_URL}/company-news?symbol=${encodeURIComponent(finnhubSymbol)}&from=${range.from}&to=${range.to}&token=***`;
+
+    try {
+        const res = await fetch(url, { cache: "no-store" });
+        if (!res.ok) {
+            const text = await res.text().catch(() => "");
+            console.warn("Finnhub company-news failed", {
+                symbol: finnhubSymbol,
+                status: res.status,
+                url: publicUrl,
+                body: text.slice(0, 200),
+            });
+            return [];
+        }
+
+        const payload = (await res.json()) as RawNewsArticle[] | { error?: string };
+        const list = Array.isArray(payload) ? payload : [];
+        const kept = list.filter(validateCompanyArticle);
+
+        if (kept.length === 0) {
+            console.warn("Finnhub company-news empty", {
+                symbol: finnhubSymbol,
+                status: res.status,
+                rawCount: list.length,
+                url: publicUrl,
+            });
+        }
+
+        return kept;
+    } catch (error) {
+        console.warn("Finnhub company-news error", { symbol: finnhubSymbol, url: publicUrl, error });
+        return [];
+    }
+}
+
 export async function getNews(symbols?: string[]): Promise<MarketNewsArticle[]> {
-    const range = getDateRange(5);
+    const range = getDateRange(14);
     const token = getFinnhubToken();
     if (!token) throw new Error("FINNHUB API key is not configured");
 
     const cleanSymbols = (symbols || [])
-        .map((s) => s?.trim().toUpperCase())
+        .map((s) => normalizeFinnhubSymbol(s || ""))
         .filter((s): s is string => Boolean(s));
 
-    const maxArticles = 6;
+    const maxArticles = 8;
 
     if (cleanSymbols.length > 0) {
         const perSymbolArticles: Record<string, RawNewsArticle[]> = {};
 
         await Promise.all(
             cleanSymbols.map(async (sym) => {
-                try {
-                    const url = `${FINNHUB_BASE_URL}/company-news?symbol=${encodeURIComponent(sym)}&from=${range.from}&to=${range.to}&token=${token}`;
-                    const articles = await fetchJSON<RawNewsArticle[]>(url, 300);
-                    perSymbolArticles[sym] = (articles || []).filter(validateArticle);
-                } catch {
-                    perSymbolArticles[sym] = [];
-                }
+                perSymbolArticles[sym] = await fetchCompanyNews(sym, range, token);
             })
         );
 
@@ -50,8 +86,8 @@ export async function getNews(symbols?: string[]): Promise<MarketNewsArticle[]> 
         for (let round = 0; round < maxArticles; round++) {
             for (const sym of cleanSymbols) {
                 const article = perSymbolArticles[sym]?.shift();
-                if (!article || !validateArticle(article)) continue;
-                collected.push(formatArticle(article, true, sym, round));
+                if (!article) continue;
+                collected.push(formatArticle(article, true, sym, collected.length));
                 if (collected.length >= maxArticles) break;
             }
             if (collected.length >= maxArticles) break;
@@ -63,15 +99,39 @@ export async function getNews(symbols?: string[]): Promise<MarketNewsArticle[]> 
         }
     }
 
-    const general = await fetchJSON<RawNewsArticle[]>(
-        `${FINNHUB_BASE_URL}/news?category=general&token=${token}`,
-        300
-    );
+    const generalUrl = `${FINNHUB_BASE_URL}/news?category=general&token=${token}`;
+    const general = await fetchJSON<RawNewsArticle[]>(generalUrl, 300);
 
     return (general || [])
         .filter(validateArticle)
         .slice(0, maxArticles)
         .map((article, index) => formatArticle(article, false, undefined, index));
+}
+
+export async function getQuotes(
+    symbols: string[]
+): Promise<Record<string, { price: number; changePercent: number }>> {
+    const token = getFinnhubToken();
+    if (!token) return {};
+
+    const unique = [...new Set(symbols.map((s) => normalizeFinnhubSymbol(s)).filter(Boolean))];
+    if (unique.length === 0) return {};
+
+    const entries = await Promise.all(
+        unique.map(async (sym) => {
+            try {
+                const url = `${FINNHUB_BASE_URL}/quote?symbol=${encodeURIComponent(sym)}&token=${token}`;
+                const quote = await fetchJSON<{ c?: number; dp?: number }>(url, 30);
+                if (typeof quote?.c !== "number" || quote.c === 0) return null;
+                return [sym, { price: quote.c, changePercent: quote.dp ?? 0 }] as const;
+            } catch (error) {
+                console.warn("Finnhub quote failed", { symbol: sym, error });
+                return null;
+            }
+        })
+    );
+
+    return Object.fromEntries(entries.filter((entry): entry is readonly [string, { price: number; changePercent: number }] => Boolean(entry)));
 }
 
 function getFinnhubToken() {

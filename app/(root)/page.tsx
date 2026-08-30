@@ -5,12 +5,16 @@ import {
     MARKET_OVERVIEW_WIDGET_CONFIG,
     TOP_STORIES_WIDGET_CONFIG
 } from "@/lib/constants";
-import {sendDailyNewsSummary} from "@/lib/inngest/functions";
+
 const Home = () => {
     const scriptUrl = `https://s3.tradingview.com/external-embedding/embed-widget-`;
 
     return (
         <div className="flex min-h-screen home-wrapper">
+            <header className="w-full mb-2">
+                <p className="text-sm text-gray-500">Today</p>
+                <h1 className="form-title mb-0">The tape, as it stands.</h1>
+            </header>
             <section className="grid w-full gap-8 home-section">
                 <div className="md:col-span-1 xl:col-span-1">
                     <TradingViewWidget
